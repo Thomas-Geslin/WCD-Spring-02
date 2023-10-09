@@ -2,9 +2,12 @@ package com.wildcodeschool.myproject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @SpringBootApplication
@@ -14,33 +17,16 @@ public class MyProjectApplication {
         SpringApplication.run(MyProjectApplication.class, args);
     }
 
-    @RequestMapping("/doctor/1")
-    @ResponseBody
-    public String firstDoctor() {
-        return "William Hartnell";
-    }
+    public String[] doctorList = new String[] {"Christopher Eccleston", "David Tennant", "Matt Smith", "Peter Capaldi", "Jodie Whittaker"};
 
-    @RequestMapping("/doctor/2")
+    @RequestMapping("/doctor/{incarnationNumber}")
     @ResponseBody
-    public String secondDoctor() {
-        return "Patrick Troughton";
-    }
-
-    @RequestMapping("/doctor/3")
-    @ResponseBody
-    public String thirdDoctor() {
-        return "Jon Pertwee";
-    }
-
-    @RequestMapping("/doctor/4")
-    @ResponseBody
-    public String fourthDoctor() {
-        return "Tom Baker";
-    }
-
-    @RequestMapping("/")
-    @ResponseBody
-    public String index() {
-        return "<ul><li><a href='http://localhost:8080/doctor/1'>First Doctor</a></li><li><a href='http://localhost:8080/doctor/2'>Second Doctor</a></li><li><a href='http://localhost:8080/doctor/3'>Third Doctor</a></li><li><a href='http://localhost:8080/doctor/4'>Fourth Doctor</a></li></ul>";
+    public String getId(@PathVariable int incarnationNumber) {
+        if(incarnationNumber >= 1 && incarnationNumber <= 8) {
+            throw new ResponseStatusException(HttpStatus.SEE_OTHER, "See other resource");
+        } else if(incarnationNumber >= 9 && incarnationNumber <= 13) {
+            return "{\"number\": " + incarnationNumber + ", \"name\" :" + "\"" + doctorList[incarnationNumber - 9] + "\"" + "}";
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, ("Impossible to retrieve the incarnation : " + incarnationNumber));
     }
 }
